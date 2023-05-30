@@ -10,29 +10,57 @@ public class HealthBarController : MonoBehaviour
     [SerializeField] private Player _player;
     [SerializeField] private TMP_Text _text;
 
-    private float _fillSpeed = 15f;
     private string _textSplit;
 
-    private void Start()
+    private void OnEnable()
     {
-        SetMaxHealth();
         _textSplit = " / ";
+
+        SetSlider();
+        SetText();
+
+        _player.HealthChanged += StartMoveBar;
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        SetHealth();
-        _text.text = _player.GetHealth.ToString() + _textSplit + _player.GetMaxHealth.ToString();
+        _player.HealthChanged -= StartMoveBar;
     }
 
-    private void SetMaxHealth()
+    private void SetSlider()
     {
         _slider.maxValue = _player.GetMaxHealth;
         _slider.value = _player.GetMaxHealth;
     }
 
-    private void SetHealth()
+    private void SetText()
     {
-        _slider.value = Mathf.MoveTowards(_slider.value, _player.GetHealth, _fillSpeed * Time.deltaTime);
+        _text.text = _slider.value + _textSplit + _player.GetMaxHealth.ToString();
+    }
+
+    private void StartMoveBar()
+    {
+        var moveBarCoroutine =  StartCoroutine(MoveBar());
+
+        if (_slider.value == _player.GetHealth)
+        {
+            StopCoroutine(moveBarCoroutine);
+        }
+    }
+
+    private IEnumerator MoveBar()
+    {
+        float healthPoints = Mathf.Abs(_slider.value - _player.GetHealth);
+        float healthPointsMove = 1;
+        var waitForSeconds = new WaitForSeconds(0.1f);
+
+        for (int i = 0; i < healthPoints; i++)
+        {
+            _slider.value = Mathf.MoveTowards(_slider.value, _player.GetHealth, healthPointsMove);
+
+            SetText();
+
+            yield return waitForSeconds;
+        }
     }
 }

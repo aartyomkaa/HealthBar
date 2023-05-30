@@ -1,9 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
+    private UnityEvent _healthChanged = new UnityEvent();
+
+    public event UnityAction HealthChanged
+    {
+        add => _healthChanged.AddListener(value);
+        remove => _healthChanged.RemoveListener(value);
+    }
+    
     private float _maxHealth = 100;
     private float _currentHealth;
 
@@ -27,6 +36,8 @@ public class Player : MonoBehaviour
             {
                 _currentHealth -= amount;
             }
+
+            _healthChanged.Invoke();
         }
     }
 
@@ -42,6 +53,8 @@ public class Player : MonoBehaviour
             {
                 _currentHealth += amount;
             }
+
+            _healthChanged.Invoke();
         }
     }
 }
