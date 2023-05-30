@@ -5,19 +5,12 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
-    private UnityEvent _healthChanged = new UnityEvent();
-
-    public event UnityAction HealthChanged
-    {
-        add => _healthChanged.AddListener(value);
-        remove => _healthChanged.RemoveListener(value);
-    }
+    public UnityAction<float> HealthChanged;
     
     private float _maxHealth = 100;
     private float _currentHealth;
 
     public float GetMaxHealth => _maxHealth;
-    public float GetHealth => _currentHealth;
 
     private void Start()
     {
@@ -26,35 +19,35 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (_currentHealth > 0)
+        if (MinHealth(amount) == false)
         {
-            if (amount > _currentHealth)
-            {
-                _currentHealth = 0;
-            }
-            else
-            {
-                _currentHealth -= amount;
-            }
+            _currentHealth -= amount;
 
-            _healthChanged.Invoke();
+            HealthChanged?.Invoke(_currentHealth);
         }
     }
 
     public void ReciveHeal(float amount) 
     { 
-        if (_currentHealth < _maxHealth)
+        if (MaxHealth(amount) == false)
         {
-            if (amount + _currentHealth > _maxHealth)
-            {
-                _currentHealth = _maxHealth;
-            }
-            else
-            {
-                _currentHealth += amount;
-            }
+            _currentHealth += amount;
 
-            _healthChanged.Invoke();
+            HealthChanged?.Invoke(_currentHealth);
         }
+    }
+
+    private bool MinHealth(float amount)
+    {
+        if (_currentHealth - amount < 0)
+            return true;
+        return false;
+    }
+
+    private bool MaxHealth(float amount)
+    {
+        if (_currentHealth + amount > _maxHealth)
+            return true;
+        return false;
     }
 }

@@ -10,12 +10,10 @@ public class HealthBarController : MonoBehaviour
     [SerializeField] private Player _player;
     [SerializeField] private TMP_Text _text;
 
-    private string _textSplit;
+    private const string _textSplit = " / ";
 
     private void OnEnable()
     {
-        _textSplit = " / ";
-
         SetSlider();
         SetText();
 
@@ -38,29 +36,29 @@ public class HealthBarController : MonoBehaviour
         _text.text = _slider.value + _textSplit + _player.GetMaxHealth.ToString();
     }
 
-    private void StartMoveBar()
+    private void StartMoveBar(float currentHealth)
     {
-        var moveBarCoroutine =  StartCoroutine(MoveBar());
+        var moveBarCoroutine = StartCoroutine(MoveBar(currentHealth));
 
-        if (_slider.value == _player.GetHealth)
+        if (_slider.value == currentHealth)
         {
             StopCoroutine(moveBarCoroutine);
         }
     }
 
-    private IEnumerator MoveBar()
+    private IEnumerator MoveBar(float currentHealth)
     {
-        float healthPoints = Mathf.Abs(_slider.value - _player.GetHealth);
+        float healthPoints = Mathf.Abs(_slider.value - currentHealth);
         float healthPointsMove = 1;
-        var waitForSeconds = new WaitForSeconds(0.1f);
+        var waitForSeconds = new WaitForSeconds(0.05f);
 
         for (int i = 0; i < healthPoints; i++)
         {
-            _slider.value = Mathf.MoveTowards(_slider.value, _player.GetHealth, healthPointsMove);
-
-            SetText();
+            _slider.value = Mathf.MoveTowards(_slider.value, currentHealth, healthPointsMove);
 
             yield return waitForSeconds;
         }
+
+        SetText();
     }
 }
