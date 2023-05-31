@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
-    public UnityAction<float> HealthChanged;
+    public UnityAction<float> OnHealthChanged;
     
     private float _maxHealth = 100;
     private float _currentHealth;
@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
         {
             _currentHealth -= amount;
 
-            HealthChanged?.Invoke(_currentHealth);
+            OnHealthChanged?.Invoke(_currentHealth);
         }
     }
 
@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
         {
             _currentHealth += amount;
 
-            HealthChanged?.Invoke(_currentHealth);
+            OnHealthChanged?.Invoke(_currentHealth);
         }
     }
 
