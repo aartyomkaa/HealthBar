@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
-    public UnityAction<float> OnHealthChanged;
+    public event UnityAction<float> OnHealthChanged;
     
     private float _maxHealth = 100;
     private float _currentHealth;
@@ -19,35 +19,25 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (MinHealth(amount) == false)
-        {
-            _currentHealth -= amount;
+        _currentHealth -= amount;
 
-            OnHealthChanged?.Invoke(_currentHealth);
+        if (_currentHealth < 0)
+        {
+            _currentHealth = 0;
         }
+
+        OnHealthChanged?.Invoke(_currentHealth);
     }
 
     public void ReciveHeal(float amount) 
     { 
-        if (MaxHealth(amount) == false)
+        _currentHealth += amount;
+
+        if (_currentHealth > _maxHealth)
         {
-            _currentHealth += amount;
-
-            OnHealthChanged?.Invoke(_currentHealth);
+            _currentHealth = _maxHealth;
         }
-    }
 
-    private bool MinHealth(float amount)
-    {
-        if (_currentHealth - amount < 0)
-            return true;
-        return false;
-    }
-
-    private bool MaxHealth(float amount)
-    {
-        if (_currentHealth + amount > _maxHealth)
-            return true;
-        return false;
+        OnHealthChanged?.Invoke(_currentHealth);
     }
 }

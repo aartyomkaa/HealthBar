@@ -12,6 +12,8 @@ public class HealthBar : MonoBehaviour
 
     private const string _textSplit = " / ";
 
+    private Coroutine _moveBar;
+
     private void OnEnable()
     {
         SetSlider();
@@ -38,22 +40,24 @@ public class HealthBar : MonoBehaviour
 
     private void StartMoveBar(float currentHealth)
     {
-        var moveBarCoroutine = StartCoroutine(MoveBar(currentHealth));
-
-        if (_slider.value == currentHealth)
+        if (_moveBar != null)
         {
-            StopCoroutine(moveBarCoroutine);
+            StopCoroutine(_moveBar);
+        }
+
+        if(_slider.value != currentHealth)
+        {
+            _moveBar = StartCoroutine(MoveBar(currentHealth));
         }
     }
 
     private IEnumerator MoveBar(float currentHealth)
     {
-        float healthPoints = Mathf.Abs(_slider.value - currentHealth);
         float healthPointsMove = 1;
         float waitSeconds = 0.05f;
         var waitForSeconds = new WaitForSeconds(waitSeconds);
 
-        for (int i = 0; i < healthPoints; i++)
+        while(_slider.value != currentHealth)
         {
             _slider.value = Mathf.MoveTowards(_slider.value, currentHealth, healthPointsMove);
 
